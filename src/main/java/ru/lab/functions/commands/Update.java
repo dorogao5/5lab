@@ -10,7 +10,7 @@ import ru.lab.builder.Console;
 
 /**
  * Команда для обновления значения элемента коллекции по заданному ключу.
- * Формат: update &lt;key> - затем последовательно считываются данные нового элемента.
+ * Формат: update <key> - затем последовательно считываются данные нового элемента.
  */
 public class Update implements Command {
     private final CollectionManager collectionManager;
@@ -30,12 +30,38 @@ public class Update implements Command {
     @Override
     public void execute(String[] args) {
         int updateKey;
-        if (args.length < 1) {
-            updateKey = Integer.parseInt(console.readInteractiveLine("Ошибка: необходимо указать ключ для обновления. Введите ключ:"));
+        String keyCandidate = null;
+
+
+        if (args.length > 0) {
+            for (String s : args) {
+                s = s.trim();
+                if (s.matches("^-?\\d+$")) {
+                    keyCandidate = s;
+                    break;
+                }
+            }
         }
-        else {
-            updateKey = Integer.parseInt(args[0]);
+
+        if (keyCandidate == null) {
+            while (true) {
+                String input = console.readInteractiveLine("Ошибка: необходимо указать ключ для обновления. Введите ключ:");
+                input = input.trim();
+                if (input.matches("^-?\\d+$")) {
+                    keyCandidate = input;
+                    break;
+                } else {
+                    System.out.println("Ошибка: введено некорректное число. Ожидается целое число.");
+                }
+            }
         }
+        try {
+            updateKey = Integer.parseInt(keyCandidate);
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка: невозможно преобразовать введённое значение в число.");
+            return;
+        }
+
         if (updateKey <= 0) {
             System.out.println("Ошибка: ключ должен быть положительным числом.");
             return;

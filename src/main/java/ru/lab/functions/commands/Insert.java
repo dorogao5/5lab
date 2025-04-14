@@ -36,12 +36,37 @@ public class Insert implements Command {
     @Override
     public void execute(String[] args) {
         int insertKey;
-        if (args.length < 1) {
-            insertKey  = Integer.parseInt(console.readInteractiveLine("Ошибка: необходимо указать ключ для вставки. Введите ключ: "));
+        String keyCandidate = null;
+
+        if (args.length > 0) {
+            for (String s : args) {
+                s = s.trim();
+                if (s.matches("^-?\\d+$")) {
+                    keyCandidate = s;
+                    break;
+                }
+            }
         }
-        else {
-            insertKey = Integer.parseInt(args[0]);
+
+        if (keyCandidate == null) {
+            while (true) {
+                String input = console.readInteractiveLine("Ошибка: необходимо указать ключ для вставки. Введите ключ: ");
+                input = input.trim();
+                if (input.matches("^-?\\d+$")) {
+                    keyCandidate = input;
+                    break;
+                } else {
+                    System.out.println("Ошибка: введено некорректное число. Ожидается целое число.");
+                }
+            }
         }
+        try {
+            insertKey = Integer.parseInt(keyCandidate);
+        } catch (NumberFormatException e) {
+            System.out.println("Ошибка: невозможно преобразовать введённое значение в число.");
+            return;
+        }
+
         Hashtable<Integer, Vehicle> collection = collectionManager.getCollection();
         if (insertKey <= 0) {
             System.out.println("Ошибка: ключ должен быть положительным числом.");
